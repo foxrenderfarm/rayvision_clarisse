@@ -13,19 +13,16 @@ def parse_requirements(filename):
 
 setup(
     name='rayvision_clarisse',
-    author='RayVision',
+    author='Shenzhen Rayvision Technology Co., Ltd',
     author_email='developer@rayvision.com',
-    url='',
+    url='https://github.com/renderbus/rayvision_clarisse',
     package_dir={'': '.'},
     packages=find_packages('.'),
-    description='',
+    description='A Python-based API for Using Renderbus cloud rendering service.',
     entry_points={},
-    install_requires=[
-        "rayvision_log",
-        "rayvision_utils",
-    ],
+    install_requires=list(parse_requirements("requirements.txt")),
     package_data={
-        'rayvision_clarisse': ["./tool/*"],
+        'rayvision_clarisse': ["./tool/*/*"],
     },
     classifiers=[
         'Programming Language :: Python',
@@ -34,5 +31,5 @@ setup(
     ],
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
-
 )
+

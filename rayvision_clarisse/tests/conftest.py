@@ -10,8 +10,8 @@ References:
 
 
 # pylint: disable=import-error
+import os, sys
 import pytest
-from rayvision_api.task.handle import RayvisionTask
 from rayvision_utils.cmd import Cmd
 
 
@@ -47,19 +47,6 @@ def handle_cmd():
 
 
 @pytest.fixture()
-def task(user_info, cg_file_c, mocker):
-    """Create an RayvisionTask object."""
-    mocker_task_id = mocker.patch.object(RayvisionTask, 'get_task_id')
-    mocker_task_id.return_value = '1234567'
-    mocker_user_id = mocker.patch.object(RayvisionTask, 'get_user_id')
-    mocker_user_id.return_value = '10000012'
-    mocker_user_id = mocker.patch.object(RayvisionTask,
-                                         'check_and_add_project_name')
-    mocker_user_id.return_value = '147258'
-    return RayvisionTask(cg_file=cg_file_c['cg_file'], **user_info)
-
-
-@pytest.fixture()
 def check(task):
     """Create an RayvisionCheck object."""
     from rayvision_api.task.check import RayvisionCheck
@@ -67,7 +54,11 @@ def check(task):
 
 
 @pytest.fixture()
-def clarisse(cg_file_c, task):
+def clarisse(tmpdir):
     """Create an Clarisse object."""
-    from rayvision_clarisse.analyse_clarisse import Clarisse
-    return Clarisse(str(cg_file_c['cg_file']), task, 2013, '')
+    from rayvision_clarisse.analyse_clarisse import AnalyzeClarisse
+    if "win" in sys.platform.lower():
+        os.environ["USERPROFILE"] = str(tmpdir)
+    else:
+        os.environ["HOME"] = str(tmpdir)
+    return AnalyzeClarisse(str(tmpdir), "clarisse_ifx_4.0_sp3")
