@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""A interface for maya."""
+"""A interface for clarisse."""
 
 # Import built-in models
 from __future__ import print_function
