@@ -8,10 +8,12 @@ References:
 
 """
 
-
 # pylint: disable=import-error
-import os, sys
+import os
+import sys
+
 import pytest
+
 from rayvision_utils.cmd import Cmd
 
 

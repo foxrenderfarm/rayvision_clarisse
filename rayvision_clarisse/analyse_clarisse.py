@@ -4,34 +4,46 @@
 # Import built-in models
 from __future__ import print_function
 from __future__ import unicode_literals
-from builtins import str
 
 import codecs
+import hashlib
 import json
 import logging
-import hashlib
 import os
 import re
 import sys
 import time
 
-from rayvision_utils import utils
-from rayvision_utils import constants
-from rayvision_utils.cmd import Cmd
-from rayvision_utils.exception import tips_code
-from rayvision_utils.exception.exception import AnalyseFailError
+from builtins import str
+
 from rayvision_clarisse.utils import convert_path
 from rayvision_clarisse.utils import str_to_unicode
 from rayvision_clarisse.utils import unicode_to_str
+from rayvision_clarisse.constants import PACKAGE_NAME
+from rayvision_utils import constants
+from rayvision_utils import utils
+from rayvision_utils.cmd import Cmd
+from rayvision_utils.exception import tips_code
+from rayvision_utils.exception.exception import AnalyseFailError
 
 VERSION = sys.version_info[0]
 
 
 class AnalyzeClarisse(object):
-    def __init__(self, cg_file, software_version, project_name=None,
-                 plugin_config=None, render_software="Clarisse",
-                 local_os=None, workspace=None, custom_exe_path=None,
-                 platform="2"):
+    def __init__(self, cg_file,
+                 software_version,
+                 project_name=None,
+                 plugin_config=None,
+                 render_software="Clarisse",
+                 local_os=None,
+                 workspace=None,
+                 custom_exe_path=None,
+                 platform="2",
+                 logger=None,
+                 log_folder=None,
+                 log_name=None,
+                 log_level="DEBUG"
+                 ):
         """Initialize and examine the analysis information.
 
         Args:
@@ -44,9 +56,18 @@ class AnalyzeClarisse(object):
             workspace (str): Analysis out of the result file storage path.
             custom_exe_path (str): Customize the exe path for the analysis.
             platform (str): Platform no.
+            logger (object, optional): Custom log object.
+            log_folder (str, optional): Custom log save location.
+            log_name (str, optional): Custom log file name.
+            log_level (string):  Set log level, example: "DEBUG","INFO","WARNING","ERROR".
 
         """
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger
+        if not self.logger:
+            from rayvision_log.core import init_logger
+            init_logger(PACKAGE_NAME, log_folder, log_name)
+            self.logger = logging.getLogger(__name__)
+            self.logger.setLevel(level=log_level.upper())
 
         self.check_path(cg_file)
         self.cg_file = cg_file
@@ -215,14 +236,14 @@ class AnalyzeClarisse(object):
         if error_code in self.tips_info:
             if isinstance(self.tips_info[error_code], list) and len(
                     self.tips_info[error_code]) > 0 and (
-                        self.tips_info[error_code][0] != info):
+                    self.tips_info[error_code][0] != info):
                 error_list = self.tips_info[error_code]
                 error_list.append(info)
                 self.tips_info[error_code] = error_list
         else:
             if ((self.py_version == 2 and isinstance(info, str)) or (
                     self.py_version == 3 and isinstance(info, str))) and (
-                        info != ""):
+                    info != ""):
                 ret = re.findall(r"Reference file not found.+?: +(.+)", info,
                                  re.I)
                 if ret:
